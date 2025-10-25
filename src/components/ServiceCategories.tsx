@@ -9,6 +9,15 @@ import {
   Building,
   Package,
 } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef } from "react";
 import regulatoryImg from "@/assets/category-regulatory.jpg";
 import consultingImg from "@/assets/category-consulting.jpg";
 import softwareImg from "@/assets/category-software.jpg";
@@ -98,6 +107,10 @@ const categories = [
 ];
 
 export const ServiceCategories = () => {
+  const plugin = useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: true })
+  );
+
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -110,54 +123,66 @@ export const ServiceCategories = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((category, index) => {
-            const Icon = category.icon;
-            return (
-              <Card
-                key={index}
-                className="group overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={category.image}
-                    alt={category.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4">
-                    <Icon className="h-10 w-10 text-white" />
-                  </div>
-                  <Badge className="absolute top-4 right-4 bg-accent text-accent-foreground">
-                    {category.providerCount} verified providers
-                  </Badge>
-                </div>
-                
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4 text-foreground">
-                    {category.title}
-                  </h3>
-                  
-                  <ul className="space-y-2 mb-6">
-                    {category.services.map((service, idx) => (
-                      <li
-                        key={idx}
-                        className="text-sm text-muted-foreground flex items-start"
-                      >
-                        <span className="mr-2 text-accent">•</span>
-                        {service}
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    Explore
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+        <Carousel
+          plugins={[plugin.current]}
+          className="w-full max-w-5xl mx-auto"
+          onMouseEnter={plugin.current.stop}
+          onMouseLeave={plugin.current.reset}
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+        >
+          <CarouselContent className="-mt-1">
+            {categories.map((category, index) => {
+              const Icon = category.icon;
+              return (
+                <CarouselItem key={index} className="pt-1 md:basis-1/2 lg:basis-1/3">
+                  <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={category.image}
+                        alt={category.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-4 left-4">
+                        <Icon className="h-10 w-10 text-white" />
+                      </div>
+                      <Badge className="absolute top-4 right-4 bg-accent text-accent-foreground">
+                        {category.providerCount} verified providers
+                      </Badge>
+                    </div>
+                    
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-semibold mb-4 text-foreground">
+                        {category.title}
+                      </h3>
+                      
+                      <ul className="space-y-2 mb-6">
+                        {category.services.map((service, idx) => (
+                          <li
+                            key={idx}
+                            className="text-sm text-muted-foreground flex items-start"
+                          >
+                            <span className="mr-2 text-accent">•</span>
+                            {service}
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        Explore
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
       </div>
     </section>
   );
