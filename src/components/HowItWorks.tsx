@@ -1,29 +1,22 @@
 import { Search, MessageSquare, Mail } from "lucide-react";
-
-const steps = [
-  {
-    number: "1",
-    icon: Search,
-    title: "Search & Discover",
-    description: "Enter your service need and postcode. Browse verified, CQC-compliant providers.",
-  },
-  {
-    number: "2",
-    icon: MessageSquare,
-    title: "Answer Quick Questions",
-    description: "Tell us about your specific needs. Get matched with perfect providers.",
-  },
-  {
-    number: "3",
-    icon: Mail,
-    title: "Register with Email",
-    description: "Quick email verification. Connect directly with providers.",
-  },
-];
-
+const steps = [{
+  number: "1",
+  icon: Search,
+  title: "Search & Discover",
+  description: "Enter your service need and postcode. Browse verified, CQC-compliant providers."
+}, {
+  number: "2",
+  icon: MessageSquare,
+  title: "Answer Quick Questions",
+  description: "Tell us about your specific needs. Get matched with perfect providers."
+}, {
+  number: "3",
+  icon: Mail,
+  title: "Register with Email",
+  description: "Quick email verification. Connect directly with providers."
+}];
 export const HowItWorks = () => {
-  return (
-    <section className="py-20 bg-muted/30">
+  return <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -36,19 +29,19 @@ export const HowItWorks = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 relative">
           {/* Connection Lines - Hidden on mobile */}
-          <div className="hidden md:block absolute top-16 left-0 right-0 h-0.5 bg-border" style={{ width: 'calc(100% - 200px)', left: '100px' }} />
+          <div className="hidden md:block absolute top-16 left-0 right-0 h-0.5 bg-border" style={{
+          width: 'calc(100% - 200px)',
+          left: '100px'
+        }} />
           
           {steps.map((step, index) => {
-            const Icon = step.icon;
-            return (
-              <div key={index} className="relative flex flex-col items-center text-center">
+          const Icon = step.icon;
+          return <div key={index} className="relative flex flex-col items-center text-center">
                 <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center mb-6 relative z-10 shadow-lg">
                   <Icon className="h-12 w-12 text-primary-foreground" />
                 </div>
                 
-                <div className="absolute top-8 -translate-y-1/2 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center text-2xl font-bold shadow-md z-20">
-                  {step.number}
-                </div>
+                
                 
                 <h3 className="text-2xl font-semibold mb-3 text-foreground">
                   {step.title}
@@ -56,11 +49,9 @@ export const HowItWorks = () => {
                 <p className="text-muted-foreground max-w-xs">
                   {step.description}
                 </p>
-              </div>
-            );
-          })}
+              </div>;
+        })}
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
