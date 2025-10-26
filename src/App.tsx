@@ -7,9 +7,11 @@ import { AuthProvider } from './lib/auth.tsx';
 import { SearchProvider } from './contexts/SearchContext';
 import { ProjectSearchProvider } from './contexts/ProjectSearchContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminProtectedRoute } from './components/AdminProtectedRoute';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import AdminLogin from "./pages/AdminLogin";
 import SignupFreelancer from "./pages/SignupFreelancer";
 import SearchResults from "./pages/SearchResults";
 import ProjectSearchResults from "./pages/ProjectSearchResults";
@@ -35,6 +37,8 @@ import MessagesPage from "./pages/Messages";
 import NotificationsPage from "./pages/Notifications";
 import SellerDashboard from "./pages/SellerDashboard";
 import AdminPanel from "./pages/AdminPanel";
+import AuthCallback from "./pages/AuthCallback";
+import AdminSignup from "./pages/AdminSignup";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +53,8 @@ const App = () => (
             <ProjectSearchProvider>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/admin/signup" element={<AdminSignup />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup/freelancer" element={<SignupFreelancer />} />
                 <Route path="/searchresults" element={<SearchResults />} />
@@ -81,14 +87,23 @@ const App = () => (
                 />
                 <Route
                   path="/home/sellers/:userid"
-                  element={<SellerDashboard />}
+                  element={
+                    <ProtectedRoute>
+                      <SellerDashboard />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route path="/seller/:id" element={<SellerProfile />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/admin/protectedroute/providershub/login" element={<AdminLogin />} />
                 <Route
                   path="/admin/protectedroute/providershub"
-                  element={<AdminPanel />}
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminPanel />
+                    </AdminProtectedRoute>
+                  }
                 />
                 <Route path="*" element={<NotFound />} />
               </Routes>

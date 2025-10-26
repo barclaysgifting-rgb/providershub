@@ -26,78 +26,9 @@ import {
 export default function MyOrders() {
   const navigate = useNavigate();
 
-  // Mock orders data
-  const activeOrders = [
-    {
-      id: 'ORD-001',
-      title: 'CQC Registration Package',
-      provider: {
-        name: 'Sarah Mitchell',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-        rating: 4.9,
-        reviews: 127
-      },
-      status: 'In Progress',
-      progress: 75,
-      amount: 1250,
-      deadline: '2024-02-15',
-      lastUpdate: '2 hours ago',
-      type: 'Premium Package'
-    },
-    {
-      id: 'ORD-002',
-      title: 'Healthcare Compliance Audit',
-      provider: {
-        name: 'David Thompson',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David',
-        rating: 4.7,
-        reviews: 93
-      },
-      status: 'Revision',
-      progress: 60,
-      amount: 850,
-      deadline: '2024-02-10',
-      lastUpdate: '1 day ago',
-      type: 'Standard Package'
-    }
-  ];
-
-  const completedOrders = [
-    {
-      id: 'ORD-003',
-      title: 'Care Home Licensing Support',
-      provider: {
-        name: 'Emma Wilson',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma',
-        rating: 5.0,
-        reviews: 89
-      },
-      status: 'Completed',
-      progress: 100,
-      amount: 2200,
-      completedDate: '2024-01-20',
-      rating: 5,
-      review: 'Excellent service! Emma was incredibly professional and delivered everything on time.',
-      type: 'Pro Package'
-    },
-    {
-      id: 'ORD-004',
-      title: 'Regulatory Documentation Review',
-      provider: {
-        name: 'Michael Chen',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Michael',
-        rating: 4.8,
-        reviews: 45
-      },
-      status: 'Completed',
-      progress: 100,
-      amount: 650,
-      completedDate: '2024-01-15',
-      rating: 4,
-      review: 'Good work, but took a bit longer than expected.',
-      type: 'Basic Package'
-    }
-  ];
+  // Database queries will populate these arrays; currently empty
+  const activeOrders = [];
+  const completedOrders = [];
 
   const getStatusColor = (status: string) => {
     switch (status) {

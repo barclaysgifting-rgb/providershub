@@ -23,26 +23,11 @@ interface Message {
   time: string;
 }
 
-const chats: ChatItem[] = [
-  { id: 'c1', name: 'Robert Taylor', avatar: 'https://i.pravatar.cc/100?img=8', lastMessage: 'Approved your offer', time: '3h', role: 'seller' },
-  { id: 'c2', name: 'Dr. Emily Carter', avatar: 'https://i.pravatar.cc/100?img=5', lastMessage: 'Your report is ready.', time: '2m', role: 'seller' },
-  { id: 'c3', name: 'You · Blood Test', avatar: 'https://i.pravatar.cc/100?img=10', lastMessage: 'Thanks! Will do.', time: '1h', role: 'buyer' },
-];
+const chats: ChatItem[] = [];
+// Database queries will populate this array; currently empty
 
-const conversation: Record<string, Message[]> = {
-  c1: [
-    { id: 'm1', sender: 'them', text: 'Hi, I can start tomorrow.', time: '09:20' },
-    { id: 'm2', sender: 'me', text: 'Great, please share availability.', time: '09:21' },
-  ],
-  c2: [
-    { id: 'm1', sender: 'them', text: 'Your report is ready.', time: '10:10' },
-    { id: 'm2', sender: 'me', text: 'Thank you!', time: '10:12' },
-  ],
-  c3: [
-    { id: 'm1', sender: 'me', text: 'Following up on the sample.', time: '08:05' },
-    { id: 'm2', sender: 'them', text: 'Received.', time: '08:08' },
-  ],
-};
+const conversation: Record<string, Message[]> = {};
+// Database queries will populate this object; currently empty
 
 export default function MessagesPage() {
   const [activeChat, setActiveChat] = useState<string>('c2');

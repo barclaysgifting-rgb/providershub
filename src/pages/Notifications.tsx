@@ -12,12 +12,8 @@ type NotificationItem = {
   type: 'order' | 'message' | 'system';
 };
 
-const allNotifications: NotificationItem[] = [
-  { id: 'n1', title: 'Order #2431 updated', description: 'Seller sent a delivery update', time: '5m', unread: true, type: 'order' },
-  { id: 'n2', title: 'New message from Emily', description: 'Can we reschedule?', time: '45m', type: 'message' },
-  { id: 'n3', title: 'Payout processed', description: '£240.00 has been sent to your account', time: '2h', type: 'system' },
-  { id: 'n4', title: 'New review received', description: '5.0 stars from Robert Taylor', time: '1d', type: 'system' },
-];
+const allNotifications: NotificationItem[] = [];
+// Database queries will populate this array; currently empty
 
 export default function NotificationsPage() {
   return (

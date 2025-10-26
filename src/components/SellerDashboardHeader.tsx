@@ -178,15 +178,23 @@ export function SellerDashboardHeader() {
             <Button variant="ghost" size="icon" onClick={() => setHelpOpen(true)}>
               <BookOpen className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/saved-services')}>
               <Heart className="h-5 w-5" />
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <img src={user?.avatar} alt={user?.name} />
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-green-100">
+                  <Avatar className="h-8 w-8 bg-white border-2 border-gray-200 hover:border-green-300 transition-colors">
+                    <img 
+                      src={user?.avatar} 
+                      alt={user?.name} 
+                      className="rounded-full w-full h-full object-cover" 
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.id || 'default'}`;
+                      }}
+                    />
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -205,15 +213,15 @@ export function SellerDashboardHeader() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/seller/update-profile')}>
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/seller/manage-orders')}>
                   <Package className="mr-2 h-4 w-4" />
                   My Projects
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/seller/earnings')}>
                   <DollarSign className="mr-2 h-4 w-4" />
                   Earnings
                 </DropdownMenuItem>
@@ -221,15 +229,15 @@ export function SellerDashboardHeader() {
                   <BookOpen className="mr-2 h-4 w-4" />
                   Portfolio
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/seller/update-profile')}>
                   <Settings className="mr-2 h-4 w-4" />
                   Account Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/payment-methods')}>
                   <CreditCard className="mr-2 h-4 w-4" />
                   Payment Methods
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/saved-services')}>
                   <Heart className="mr-2 h-4 w-4" />
                   Saved Projects
                 </DropdownMenuItem>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SellerDashboardHeader } from '../components/SellerDashboardHeader';
 import { Footer } from '../components/Footer';
@@ -11,6 +11,8 @@ import { Badge } from '../components/ui/badge';
 import { Label } from '../components/ui/label';
 import { Progress } from '../components/ui/progress';
 import { Avatar } from '../components/ui/avatar';
+import { useAuth } from '../lib/auth.tsx';
+import { supabase } from '../lib/supabase';
 import {
   ArrowLeft,
   User,
@@ -28,41 +30,78 @@ import {
 
 export default function SellerUpdateProfile() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // Mock current profile data
+  // Load real profile data from database
   const [profile, setProfile] = useState({
-    name: 'John Anderson',
-    title: 'Healthcare Compliance Specialist',
-    bio: 'Experienced healthcare compliance consultant with 8+ years in regulatory affairs. Specializing in CQC registration, compliance audits, and regulatory documentation for care homes and healthcare facilities.',
-    location: 'London, UK',
-    phone: '+44 20 1234 5678',
-    email: 'john.anderson@email.com',
-    website: 'https://johnandersonconsulting.com',
-    languages: ['English', 'Spanish'],
-    experience: '8-10',
-    hourlyRate: '85',
-    profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-    skills: [
-      'CQC Registration',
-      'Healthcare Compliance',
-      'Regulatory Consulting',
-      'Compliance Audits',
-      'Quality Management'
-    ],
-    certifications: [
-      'CQC Registered Consultant',
-      'Healthcare Compliance Professional',
-      'Data Protection Officer Certified'
-    ],
-    portfolioItems: 24,
-    completedOrders: 156,
-    rating: 4.9,
-    reviews: 89
+    name: '',
+    title: '',
+    bio: '',
+    location: '',
+    phone: '',
+    email: '',
+    website: '',
+    languages: [] as string[],
+    experience: '',
+    hourlyRate: '',
+    profileImage: '',
+    skills: [] as string[],
+    certifications: [] as string[],
+    portfolioItems: 0,
+    completedOrders: 0,
+    rating: 0,
+    reviews: 0
   });
 
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [newSkill, setNewSkill] = useState('');
   const [newLanguage, setNewLanguage] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+
+  // Load profile data on component mount
+  useEffect(() => {
+    const loadProfileData = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error loading profile:', error);
+        } else if (data) {
+          setProfile({
+            name: data.name || '',
+            title: data.job_title || '',
+            bio: data.bio || '',
+            location: data.location || '',
+            phone: '', // Not stored in users table yet
+            email: user.email || '',
+            website: data.website || '',
+            languages: [], // Not stored yet
+            experience: data.experience || '',
+            hourlyRate: '', // Not stored yet
+            profileImage: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`,
+            skills: data.specializations || [],
+            certifications: [], // Not stored yet
+            portfolioItems: 0, // Would need to count portfolios
+            completedOrders: data.review_count || 0,
+            rating: data.rating || 0,
+            reviews: data.review_count || 0
+          });
+        }
+      } catch (error) {
+        console.error('Error loading profile data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfileData();
+  }, [user]);
 
   const experienceLevels = [
     { value: '1-2', label: '1-2 years' },
@@ -111,12 +150,33 @@ export default function SellerUpdateProfile() {
   };
 
   const handleSaveProfile = async () => {
-    setIsSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSaving(false);
-    // Navigate back to dashboard or show success message
-    navigate('/home/sellers/123');
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          name: profile.name,
+          job_title: profile.title,
+          bio: profile.bio,
+          location: profile.location,
+          website: profile.website,
+          experience: profile.experience,
+          specializations: profile.skills,
+        })
+        .eq('id', user?.id);
+
+      if (error) {
+        console.error('Error saving profile:', error);
+        alert('Error saving profile. Please try again.');
+      } else {
+        alert('Profile saved successfully!');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const profileCompletion = 85; // Mock completion percentage
@@ -474,12 +534,12 @@ export default function SellerUpdateProfile() {
               <CardContent className="pt-6">
                 <Button
                   onClick={handleSaveProfile}
-                  disabled={isSaving}
+                  disabled={saving}
                   className="w-full"
                   size="lg"
                 >
                   <Save className="mr-2 h-5 w-5" />
-                  {isSaving ? 'Saving...' : 'Save Profile'}
+                  {saving ? 'Saving...' : 'Save Profile'}
                 </Button>
                 <p className="text-sm text-gray-500 text-center mt-2">
                   Changes will be reviewed before going live

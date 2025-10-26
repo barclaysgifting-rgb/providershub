@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '../components/ui/dialog';
 import { useAuth } from '../lib/auth.tsx';
+import { supabase } from '../lib/supabase';
 
 interface RegistrationData {
   service: string;
@@ -39,6 +40,9 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
   const navigate = useNavigate();
   const auth = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [isWaitingForConfirmation, setIsWaitingForConfirmation] = useState(false);
+  const [signupEmail, setSignupEmail] = useState('');
   const [formData, setFormData] = useState<RegistrationData>({
     service: initialService || '',
     urgency: '',
@@ -57,6 +61,9 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
   useEffect(() => {
     if (open) {
       setCurrentStep(1);
+      setIsWaitingForConfirmation(false);
+      setIsSigningUp(false);
+      setSignupEmail('');
       setFormData({
         service: initialService || '',
         urgency: '',
@@ -73,11 +80,56 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
     }
   }, [open, initialService, initialLocation]);
 
+  // Listen for auth state changes during email verification
+  useEffect(() => {
+    if (!isWaitingForConfirmation || !signupEmail) return;
+
+    console.log('Waiting for email confirmation for:', signupEmail);
+
+    // The AuthProvider will handle the auth state changes
+    // When the user confirms their email, the auth state will change
+    // and the modal should close automatically due to the auth state listener
+
+    // Set up a timeout to close the modal if confirmation takes too long
+    const timeout = setTimeout(() => {
+      if (isWaitingForConfirmation) {
+        console.log('Email confirmation timeout, closing modal');
+        setIsWaitingForConfirmation(false);
+        onOpenChange(false);
+        alert('Email confirmation is taking longer than expected. Please try refreshing the page or check your email again.');
+      }
+    }, 300000); // 5 minutes timeout
+
+    return () => clearTimeout(timeout);
+  }, [isWaitingForConfirmation, signupEmail, onOpenChange]);
+
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const nextStep = () => {
+    // Validation for each step
+    switch (currentStep) {
+      case 1:
+        if (!formData.service) {
+          alert('Please select a service to continue.');
+          return;
+        }
+        break;
+      case 2:
+        if (!formData.urgency) {
+          alert('Please select a timeline to continue.');
+          return;
+        }
+        break;
+      case 3:
+        if (!formData.budget) {
+          alert('Please select a budget range to continue.');
+          return;
+        }
+        break;
+    }
+
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
@@ -94,18 +146,40 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
       alert('Passwords do not match');
       return;
     }
+
+    setIsSigningUp(true);
+    console.log('Starting signup process...');
+
     try {
-      // TODO: Implement user registration API call
-      console.log('User registration:', formData);
+      // Use Supabase signup to create the user account
+      const result = await auth.signup(
+        formData.email,
+        formData.password,
+        formData.email.split('@')[0], // Use email prefix as name initially
+        'client' // Default role for signup users
+      );
 
-      // After successful registration, automatically log in the user
-      await auth.login(formData.email, formData.password);
+      console.log('Signup result:', result);
+      setIsSigningUp(false); // Always set loading to false after API call
 
-      // Close modal and navigate to dashboard
-      onOpenChange(false);
-      navigate('/home/user123'); // User ID would come from registration response in real app
+      if (result.success) {
+        if (result.requiresConfirmation) {
+          console.log('Email confirmation required, switching to step 5');
+          // Email confirmation required - keep modal open and show waiting state
+          setSignupEmail(formData.email);
+          setIsWaitingForConfirmation(true);
+          setCurrentStep(5); // Show confirmation waiting step
+        } else {
+          console.log('No confirmation required, closing modal');
+          // No confirmation required - close modal immediately
+          onOpenChange(false);
+          // Navigation will be handled by auth state change
+        }
+      }
     } catch (error) {
       console.error('Registration failed:', error);
+      setIsSigningUp(false); // Ensure loading is set to false on error
+      alert('Registration failed. Please try again or contact support.');
     }
   };
 
@@ -309,6 +383,51 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
           </div>
         );
 
+      case 5:
+        return (
+          <div className="space-y-6 text-center">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-blue-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Verify Your Account</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                We've sent a verification email to <strong>{signupEmail}</strong>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Please verify your account by clicking the confirmation link in your email.
+              </p>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-center justify-center space-x-2 text-blue-700">
+                <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span className="text-sm font-medium">Waiting for email confirmation...</span>
+              </div>
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              <p>This window will automatically close once you confirm your email.</p>
+              <button
+                onClick={() => {
+                  setIsWaitingForConfirmation(false);
+                  setCurrentStep(4);
+                }}
+                className="text-blue-600 hover:underline mt-2"
+              >
+                Wrong email? Go back to change it.
+              </button>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -319,28 +438,53 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center">
-            Join Providers Hub
-            <div className="text-sm font-normal text-muted-foreground mt-2">
-              Step {currentStep} of 4
-            </div>
+            {currentStep < 5 ? (
+              <>
+                Join Providers Hub
+                <div className="text-sm font-normal text-muted-foreground mt-2">
+                  Step {currentStep} of 4
+                </div>
+              </>
+            ) : (
+              'Email Confirmation Required'
+            )}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={(e) => { e.preventDefault(); currentStep === 4 ? handleSubmit() : nextStep(); }} className="space-y-6">
+        <form onSubmit={(e) => { e.preventDefault(); currentStep === 4 && !isSigningUp && handleSubmit(); }} className="space-y-6">
           {renderStepContent()}
 
-          <div className="flex justify-between mt-8">
-            {currentStep > 1 && (
-              <Button type="button" variant="outline" onClick={prevStep}>
-                Previous
-              </Button>
-            )}
-            <div className="ml-auto">
-              <Button type="submit">
-                {currentStep === 4 ? 'Create Account' : 'Next'}
+          {currentStep < 4 && (
+            <div className="flex justify-between mt-8">
+              {currentStep > 1 && (
+                <Button type="button" variant="outline" onClick={prevStep}>
+                  Previous
+                </Button>
+              )}
+              <div className="ml-auto">
+                <Button type="button" onClick={currentStep === 4 ? handleSubmit : nextStep}>
+                  {currentStep === 4 ? 'Create Account' : 'Next'}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 4 && (
+            <div className="flex justify-center mt-8">
+              <Button type="submit" disabled={isSigningUp} className="w-full">
+                {isSigningUp ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Creating Account...
+                  </>
+                ) : (
+                  'Create Account'
+                )}
               </Button>
             </div>
-          </div>
+          )}
         </form>
 
         {currentStep === 1 && (

@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../lib/auth.tsx';
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { TrustedBy } from "@/components/TrustedBy";
@@ -13,6 +16,20 @@ import { FinalCTA } from "@/components/FinalCTA";
 import { Footer } from "@/components/Footer";
 
 const Index = () => {
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect authenticated users to their dashboard
+    if (isAuthenticated && user) {
+      if (user.role === 'provider') {
+        navigate(`/home/sellers/${user.id}`, { replace: true });
+      } else {
+        navigate(`/home/${user.id}`, { replace: true });
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
+
   return (
     <div className="min-h-screen">
       <Navigation />
