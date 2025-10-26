@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -60,11 +61,11 @@ export const Navigation = () => {
 
         {/* Right Side Actions */}
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" className="hidden md:inline-flex">
-            Login
+          <Button variant="ghost" className="hidden md:inline-flex" asChild>
+            <Link to="/login">Login</Link>
           </Button>
-          <Button className="bg-primary hover:bg-primary/90">
-            Join as a Professional
+          <Button className="bg-primary hover:bg-primary/90" asChild>
+            <Link to="/signup/freelancer">Join as a Professional</Link>
           </Button>
           <Button variant="ghost" size="icon" className="lg:hidden">
             <Menu className="h-5 w-5" />

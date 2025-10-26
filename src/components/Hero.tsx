@@ -8,6 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, MapPin } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import heroBackground from "@/assets/hero-background.jpg";
 
 const popularSearches = [
@@ -20,6 +22,32 @@ const popularSearches = [
 ];
 
 export const Hero = () => {
+  const [selectedService, setSelectedService] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    // Navigate to search results with query parameters
+    const params = new URLSearchParams();
+    if (selectedService) params.set('service', selectedService);
+    if (postcode) params.set('location', postcode);
+    navigate(`/search?${params.toString()}`);
+  };
+
+  const handlePopularSearch = (service: string) => {
+    // Map popular search terms to service codes
+    const serviceMap: { [key: string]: string } = {
+      "CQC Registration": "cqc",
+      "Care Software": "software",
+      "Sponsor Visa": "visa",
+      "Health & Safety": "training",
+      "Accountants": "accounting",
+      "PPE Suppliers": "consulting"
+    };
+
+    const serviceCode = serviceMap[service] || "consulting";
+    navigate(`/search?service=${serviceCode}`);
+  };
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -46,7 +74,7 @@ export const Hero = () => {
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-xl p-3 mb-8 animate-scale-in">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="flex-1">
-              <Select>
+              <Select value={selectedService} onValueChange={setSelectedService}>
                 <SelectTrigger className="h-14 text-base">
                   <SelectValue placeholder="What service are you looking for?" />
                 </SelectTrigger>
@@ -67,13 +95,15 @@ export const Hero = () => {
                 <Input
                   placeholder="Enter your postcode"
                   className="h-14 pl-10 text-base"
+                  value={postcode}
+                  onChange={(e) => setPostcode(e.target.value)}
                 />
               </div>
             </div>
             
-            <Button size="lg" className="h-14 px-8 bg-primary hover:bg-primary/90">
+            <Button size="lg" className="h-14 px-8 bg-primary hover:bg-primary/90" onClick={handleSearch}>
               <Search className="mr-2 h-5 w-5" />
-              Search
+              Get Started
             </Button>
           </div>
         </div>
@@ -85,6 +115,7 @@ export const Hero = () => {
             <button
               key={search}
               className="px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm rounded-full transition-colors duration-200"
+              onClick={() => handlePopularSearch(search)}
             >
               {search}
             </button>
