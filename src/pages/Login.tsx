@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth.tsx';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
+import { Card, CardContent } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Building2, Shield } from 'lucide-react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -14,7 +13,6 @@ export default function LoginPage() {
   const auth = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'provider' | 'client'>('client');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +25,7 @@ export default function LoginPage() {
 
     try {
       console.log('Attempting login...');
-      await auth.login(email, password, role);
+      await auth.login(email, password);
       console.log('Login API call completed');
 
       // Don't check auth state immediately - let the auth state change listener handle it
@@ -69,76 +67,124 @@ export default function LoginPage() {
   }, [isLoading]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">Sign in to Providers Hub</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={role} onValueChange={(value) => setRole(value as 'provider' | 'client')} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="client">I'm a Buyer</TabsTrigger>
-              <TabsTrigger value="provider">I'm a Seller</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          {error && (
-            <Alert className="mb-6" variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1"
-                disabled={isLoading}
-              />
+    <div className="min-h-screen flex">
+      {/* Left side - Image/Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="relative z-10 flex flex-col justify-center items-center text-white p-12">
+          <div className="max-w-md text-center">
+            <div className="mb-8">
+              <Building2 className="h-16 w-16 mx-auto mb-4 text-white/90" />
+              <h1 className="text-4xl font-bold mb-2">Healthcare Nexus</h1>
+              <p className="text-xl text-blue-100">Connecting Care Providers</p>
             </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1"
-                disabled={isLoading}
-              />
+            <div className="space-y-4 text-lg">
+              <div className="flex items-center">
+                <Shield className="h-5 w-5 mr-3 text-green-400" />
+                <span>Secure & Trusted Platform</span>
+              </div>
+              <div className="flex items-center">
+                <Building2 className="h-5 w-5 mr-3 text-green-400" />
+                <span>Professional Healthcare Services</span>
+              </div>
             </div>
+          </div>
+        </div>
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24" />
+      </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <svg className="w-4 h-4 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Signing in...
-                </>
-              ) : (
-                `Sign in as ${role === 'provider' ? 'Seller' : 'Buyer'}`
+      {/* Right side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+        <div className="w-full max-w-md space-y-8">
+          {/* Mobile logo - only show on mobile */}
+          <div className="lg:hidden text-center">
+            <Building2 className="h-12 w-12 mx-auto mb-4 text-blue-600" />
+            <h1 className="text-2xl font-bold text-gray-900">Healthcare Nexus</h1>
+          </div>
+
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+            <p className="text-gray-600">Sign in to your account</p>
+          </div>
+
+          <Card className="shadow-lg border-0">
+            <CardContent className="p-8">
+              {error && (
+                <Alert className="mb-6" variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-12 text-base"
+                    placeholder="Enter your email"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-12 text-base"
+                    placeholder="Enter your password"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 text-base font-semibold bg-blue-600 hover:bg-blue-700"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <svg className="w-5 h-5 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <div className="text-sm text-gray-600">
+                  Don't have an account?{' '}
+                  <Link to="/signup/freelancer" className="text-blue-600 hover:text-blue-500 font-medium">
+                    Sign up as Provider
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
