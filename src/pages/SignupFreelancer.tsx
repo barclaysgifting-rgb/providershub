@@ -43,6 +43,30 @@ export default function SignupFreelancer() {
     }
   }, [auth.isAuthenticated, auth.user, isWaitingForConfirmation, navigate, signupData]);
 
+  // Listen for verification success messages from popup window
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data.type === 'EMAIL_VERIFIED' && isWaitingForConfirmation) {
+        console.log('Received verification success from popup window:', event.data);
+
+        // The popup window has verified the email, now we need to set the session
+        if (event.data.session) {
+          const { error } = await supabase.auth.setSession(event.data.session);
+          if (error) {
+            console.error('Error setting session from popup:', error);
+            setError('Failed to complete login after verification. Please try logging in manually.');
+          } else {
+            console.log('Session set successfully from popup verification');
+            // The useEffect above will handle the redirection once auth state updates
+          }
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [isWaitingForConfirmation]);
+
   const saveProfileData = async (data: any) => {
     try {
       const { data: user } = await supabase.auth.getUser();

@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   NavigationMenu,
@@ -66,9 +65,6 @@ export const Navigation = () => {
           </Button>
           <Button className="bg-primary hover:bg-primary/90" asChild>
             <Link to="/signup/freelancer">Join as a Professional</Link>
-          </Button>
-          <Button variant="ghost" size="icon" className="lg:hidden">
-            <Menu className="h-5 w-5" />
           </Button>
         </div>
       </nav>

@@ -38,6 +38,7 @@ import NotificationsPage from "./pages/Notifications";
 import SellerDashboard from "./pages/SellerDashboard";
 import AdminPanel from "./pages/AdminPanel";
 import AuthCallback from "./pages/AuthCallback";
+import VerificationSuccess from "./pages/VerificationSuccess";
 import AdminSignup from "./pages/AdminSignup";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/auth/verification-success" element={<VerificationSuccess />} />
                 <Route path="/admin/signup" element={<AdminSignup />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup/freelancer" element={<SignupFreelancer />} />

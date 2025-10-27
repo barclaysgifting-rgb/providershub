@@ -103,6 +103,30 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
     return () => clearTimeout(timeout);
   }, [isWaitingForConfirmation, signupEmail, onOpenChange]);
 
+  // Listen for verification success messages from popup window
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data.type === 'EMAIL_VERIFIED' && isWaitingForConfirmation) {
+        console.log('Received verification success from popup window:', event.data);
+
+        // The popup window has verified the email, now we need to set the session
+        if (event.data.session) {
+          const { error } = await supabase.auth.setSession(event.data.session);
+          if (error) {
+            console.error('Error setting session from popup:', error);
+            alert('Failed to complete login after verification. Please try logging in manually.');
+          } else {
+            console.log('Session set successfully from popup verification');
+            // The modal should close automatically due to auth state changes
+          }
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [isWaitingForConfirmation]);
+
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
