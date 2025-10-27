@@ -103,44 +103,14 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
     return () => clearTimeout(timeout);
   }, [isWaitingForConfirmation, signupEmail, onOpenChange]);
 
-  // Listen for verification success messages from popup window
+  // Auto-close modal when user becomes authenticated after verification
   useEffect(() => {
-    const handleMessage = async (event: MessageEvent) => {
-      console.log('SignupUser received message event:', {
-        type: event.data?.type,
-        origin: event.origin,
-        isWaiting: isWaitingForConfirmation,
-        hasSession: !!event.data?.session
-      });
-
-      if (event.data?.type === 'EMAIL_VERIFIED' && isWaitingForConfirmation) {
-        console.log('Received verification success from popup window:', event.data);
-
-        // The popup window has verified the email, now we need to set the session
-        if (event.data.session) {
-          const { error } = await supabase.auth.setSession(event.data.session);
-          if (error) {
-            console.error('Error setting session from popup:', error);
-            alert('Failed to complete login after verification. Please try logging in manually.');
-          } else {
-            console.log('Session set successfully from popup verification');
-            // The modal should close automatically due to auth state changes
-          }
-        } else {
-          console.warn('No session data in verification message');
-        }
-      }
-    };
-
-    if (isWaitingForConfirmation) {
-      console.log('SignupUser: Setting up message listener for email verification');
-      window.addEventListener('message', handleMessage);
-      return () => {
-        console.log('SignupUser: Removing message listener');
-        window.removeEventListener('message', handleMessage);
-      };
+    if (auth.isAuthenticated && auth.user && isWaitingForConfirmation) {
+      console.log('User authenticated after verification, closing signup modal');
+      setIsWaitingForConfirmation(false);
+      onOpenChange(false);
     }
-  }, [isWaitingForConfirmation]);
+  }, [auth.isAuthenticated, auth.user, isWaitingForConfirmation, onOpenChange]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -440,9 +410,6 @@ export default function SignupUser({ open, onOpenChange, initialService, initial
               </p>
               <p className="text-sm text-muted-foreground mb-2">
                 Please click the confirmation link in your email.
-              </p>
-              <p className="text-xs text-blue-600 font-medium">
-                💡 Tip: Right-click the link and select "Open in new tab" to keep this window open
               </p>
             </div>
 

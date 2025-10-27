@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { CheckCircle } from 'lucide-react';
 
 export default function VerificationSuccess() {
+  const navigate = useNavigate();
   const [isVerifying, setIsVerifying] = useState(true);
   const [verificationStatus, setVerificationStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [error, setError] = useState<string | null>(null);
@@ -31,21 +33,10 @@ export default function VerificationSuccess() {
             console.log('OTP verified successfully:', data);
             setVerificationStatus('success');
 
-            // Signal to parent window that verification is complete
-            if (window.opener && !window.opener.closed) {
-              console.log('Sending verification success to parent window:', {
-                type: 'EMAIL_VERIFIED',
-                user: data.user,
-                session: data.session
-              });
-              window.opener.postMessage({
-                type: 'EMAIL_VERIFIED',
-                user: data.user,
-                session: data.session
-              }, window.location.origin);
-            } else {
-              console.log('No parent window found or window is closed');
-            }
+            // Redirect to auth callback which will handle the login and redirect to dashboard
+            setTimeout(() => {
+              navigate('/auth/callback', { replace: true });
+            }, 2000);
           }
         } else {
           setVerificationStatus('error');
@@ -61,7 +52,7 @@ export default function VerificationSuccess() {
     };
 
     handleVerification();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -87,17 +78,11 @@ export default function VerificationSuccess() {
               Email Verified Successfully!
             </h2>
             <p className="text-gray-600 mb-4">
-              Your account has been verified. Please return to the signup page to continue.
+              Your account has been verified. Redirecting you to continue...
             </p>
             <p className="text-sm text-gray-500">
-              You can close this window now.
+              You will be redirected automatically in a few seconds...
             </p>
-            <button
-              onClick={() => window.close()}
-              className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Close Window
-            </button>
           </>
         )}
 
@@ -117,10 +102,10 @@ export default function VerificationSuccess() {
               {error || 'There was an error verifying your email. Please try again.'}
             </p>
             <button
-              onClick={() => window.close()}
+              onClick={() => navigate('/')}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
-              Close Window
+              Go to Home
             </button>
           </>
         )}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth.tsx';
 import { supabase } from '../lib/supabase';
+import type { Database } from '../lib/database.types';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -43,62 +44,26 @@ export default function SignupFreelancer() {
     }
   }, [auth.isAuthenticated, auth.user, isWaitingForConfirmation, navigate, signupData]);
 
-  // Listen for verification success messages from popup window
-  useEffect(() => {
-    const handleMessage = async (event: MessageEvent) => {
-      console.log('Received message event:', {
-        type: event.data?.type,
-        origin: event.origin,
-        isWaiting: isWaitingForConfirmation,
-        hasSession: !!event.data?.session
-      });
-
-      if (event.data?.type === 'EMAIL_VERIFIED' && isWaitingForConfirmation) {
-        console.log('Received verification success from popup window:', event.data);
-
-        // The popup window has verified the email, now we need to set the session
-        if (event.data.session) {
-          const { error } = await supabase.auth.setSession(event.data.session);
-          if (error) {
-            console.error('Error setting session from popup:', error);
-            setError('Failed to complete login after verification. Please try logging in manually.');
-          } else {
-            console.log('Session set successfully from popup verification');
-            // The useEffect above will handle the redirection once auth state updates
-          }
-        } else {
-          console.warn('No session data in verification message');
-        }
-      }
-    };
-
-    if (isWaitingForConfirmation) {
-      console.log('Setting up message listener for email verification');
-      window.addEventListener('message', handleMessage);
-      return () => {
-        console.log('Removing message listener');
-        window.removeEventListener('message', handleMessage);
-      };
-    }
-  }, [isWaitingForConfirmation]);
-
   const saveProfileData = async (data: any) => {
     try {
       const { data: user } = await supabase.auth.getUser();
       if (user.user) {
         const fullName = `${data.firstName} ${data.lastName}`.trim();
+        const updatePayload: Database['public']['Tables']['users']['Update'] = {
+          name: fullName,
+          company: data.businessName || null,
+          job_title: data.serviceCategory || null,
+          bio: data.bio || null,
+          experience: data.experience || null,
+          specializations: data.serviceCategory ? [data.serviceCategory] : null,
+          location: null,
+          website: null,
+        };
+
         await supabase
           .from('users')
-          .update({
-            name: fullName,
-            company: data.businessName || null,
-            job_title: data.serviceCategory || null,
-            bio: data.bio || null,
-            experience: data.experience || null,
-            specializations: data.serviceCategory ? [data.serviceCategory] : null,
-            location: null, // Will be set in profile update
-            website: null, // Will be set in profile update
-          })
+          // @ts-ignore: TypeScript incorrectly infers Update type as never
+          .update(updatePayload)
           .eq('id', user.user.id);
 
         console.log('Profile data saved successfully');
@@ -198,9 +163,6 @@ export default function SignupFreelancer() {
                 </p>
                 <p className="text-sm text-muted-foreground mb-2">
                   Please click the confirmation link in your email.
-                </p>
-                <p className="text-xs text-blue-600 font-medium">
-                  💡 Tip: Right-click the link and select "Open in new tab" to keep this page open
                 </p>
               </div>
 
