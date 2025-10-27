@@ -1,5 +1,7 @@
 import { DashboardHeader } from '../components/DashboardHeader';
 import { Footer } from '../components/Footer';
+import { MobileBottomNavbar } from '../components/MobileBottomNavbar';
+import { DashboardLayout } from '../components/DashboardLayout';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -87,10 +89,8 @@ export default function DashboardPage() {
   const basedOnSearchesServices = [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader />
-
-      <main className="container mx-auto px-4 py-8">
+    <DashboardLayout>
+      <main className="container mx-auto px-4 py-8 pb-20 md:pb-8">
         {/* Welcome Banner */}
         <section className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 mb-8 text-white">
           <div className="flex justify-between items-center">
@@ -329,6 +329,6 @@ export default function DashboardPage() {
         </div>
       </main>
       <Footer />
-    </div>
+    </DashboardLayout>
   );
 }

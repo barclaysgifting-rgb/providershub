@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { DashboardHeader } from '../components/DashboardHeader';
+import { DashboardLayout } from '../components/DashboardLayout';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Avatar } from '../components/ui/avatar';
@@ -36,9 +37,8 @@ export default function MessagesPage() {
   const activeMsgs = useMemo(() => conversation[activeChat] ?? [], [activeChat]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader />
-      <main className="container mx-auto px-4 py-6">
+    <DashboardLayout>
+      <main className="container mx-auto px-4 py-6 pb-20 md:pb-6">
         <Card>
           <CardHeader>
             <CardTitle>Messages</CardTitle>
@@ -133,6 +133,6 @@ export default function MessagesPage() {
           </CardContent>
         </Card>
       </main>
-    </div>
+    </DashboardLayout>
   );
 }

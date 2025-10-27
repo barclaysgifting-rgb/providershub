@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { DashboardHeader } from '../components/DashboardHeader';
+import { DashboardLayout } from '../components/DashboardLayout';
 import { Footer } from '../components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -738,27 +739,61 @@ export default function SearchResults() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader />
+    <DashboardLayout>
+      <div className="container mx-auto px-4 py-8 pb-20 md:pb-8 overflow-x-hidden">
+        {/* Mobile Search Bar */}
+        <div className="md:hidden mb-6">
+          <div className="bg-white rounded-lg border p-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder="Search services..."
+                  className="w-full"
+                  defaultValue={service}
+                  onChange={(e) => {
+                    const newService = e.target.value;
+                    if (newService) {
+                      navigate(`/searchresults?service=${encodeURIComponent(newService)}${location ? `&location=${encodeURIComponent(location)}` : ''}`);
+                    } else {
+                      navigate('/searchresults');
+                    }
+                  }}
+                />
+              </div>
+              <div className="w-full sm:w-32">
+                <Input
+                  type="text"
+                  placeholder="Location"
+                  className="w-full"
+                  defaultValue={location}
+                  onChange={(e) => {
+                    const newLocation = e.target.value;
+                    navigate(`/searchresults${service ? `?service=${encodeURIComponent(service)}` : ''}${newLocation ? `&location=${encodeURIComponent(newLocation)}` : ''}`);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate(-1)}
-              className="mr-4"
+              className="self-start"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
                 {service ? `Search Results for "${service}"` : 'All Freelancers'}
                 {location && <span className="text-gray-600"> in {location}</span>}
               </h1>
@@ -767,9 +802,9 @@ export default function SearchResults() {
               </p>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-48">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -781,7 +816,7 @@ export default function SearchResults() {
                 </SelectContent>
               </Select>
 
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Filter className="h-4 w-4 mr-2" />
                 Filters
               </Button>
@@ -823,14 +858,14 @@ export default function SearchResults() {
                     </div>
 
                     {/* Location and Response Time */}
-                    <div className="flex items-center justify-center space-x-4 mb-3 text-xs text-gray-600">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2 sm:gap-4 mb-3 text-xs text-gray-600">
                       <div className="flex items-center">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {freelancer.location}
+                        <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">{freelancer.location}</span>
                       </div>
                       <div className="flex items-center">
-                        <Clock className="h-3 w-3 mr-1" />
-                        {freelancer.responseTime}
+                        <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">{freelancer.responseTime}</span>
                       </div>
                     </div>
 
@@ -838,7 +873,9 @@ export default function SearchResults() {
                     <div className="flex flex-wrap justify-center gap-1 mb-3">
                       <Badge variant="secondary" className="text-xs">{freelancer.level}</Badge>
                       {freelancer.badges.slice(0, 2).map((badge, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">{badge}</Badge>
+                        <Badge key={index} variant="outline" className="text-xs truncate max-w-[100px]">
+                          {badge}
+                        </Badge>
                       ))}
                     </div>
 
@@ -848,7 +885,7 @@ export default function SearchResults() {
                     {/* Skills */}
                     <div className="flex flex-wrap justify-center gap-1 mb-4">
                       {freelancer.skills.slice(0, 3).map((skill, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
+                        <Badge key={index} variant="secondary" className="text-xs truncate max-w-[120px]">
                           {skill}
                         </Badge>
                       ))}
@@ -901,6 +938,6 @@ export default function SearchResults() {
         )}
       </div>
       <Footer />
-    </div>
+    </DashboardLayout>
   );
 }
