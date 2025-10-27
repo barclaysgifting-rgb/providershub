@@ -46,7 +46,14 @@ export default function SignupFreelancer() {
   // Listen for verification success messages from popup window
   useEffect(() => {
     const handleMessage = async (event: MessageEvent) => {
-      if (event.data.type === 'EMAIL_VERIFIED' && isWaitingForConfirmation) {
+      console.log('Received message event:', {
+        type: event.data?.type,
+        origin: event.origin,
+        isWaiting: isWaitingForConfirmation,
+        hasSession: !!event.data?.session
+      });
+
+      if (event.data?.type === 'EMAIL_VERIFIED' && isWaitingForConfirmation) {
         console.log('Received verification success from popup window:', event.data);
 
         // The popup window has verified the email, now we need to set the session
@@ -59,12 +66,20 @@ export default function SignupFreelancer() {
             console.log('Session set successfully from popup verification');
             // The useEffect above will handle the redirection once auth state updates
           }
+        } else {
+          console.warn('No session data in verification message');
         }
       }
     };
 
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    if (isWaitingForConfirmation) {
+      console.log('Setting up message listener for email verification');
+      window.addEventListener('message', handleMessage);
+      return () => {
+        console.log('Removing message listener');
+        window.removeEventListener('message', handleMessage);
+      };
+    }
   }, [isWaitingForConfirmation]);
 
   const saveProfileData = async (data: any) => {
@@ -181,8 +196,11 @@ export default function SignupFreelancer() {
                 <p className="text-sm text-muted-foreground mb-4">
                   We've sent a verification email to <strong>{signupEmail}</strong>
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Please verify your account by clicking the confirmation link in your email.
+                <p className="text-sm text-muted-foreground mb-2">
+                  Please click the confirmation link in your email.
+                </p>
+                <p className="text-xs text-blue-600 font-medium">
+                  💡 Tip: Right-click the link and select "Open in new tab" to keep this page open
                 </p>
               </div>
 
