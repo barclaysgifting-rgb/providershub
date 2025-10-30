@@ -69,17 +69,17 @@ export function DashboardHeader() {
           {/* Top Bar with Stats */}
           <div className="h-12 flex items-center justify-between border-b border-gray-100">
             <div className="flex items-center space-x-3 md:space-x-6">
-              <div className="hidden sm:flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <TrendingUp className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium">12</span>
                 <span className="text-xs text-gray-500">active orders</span>
               </div>
-              <div className="hidden sm:flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <MessageSquare className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium">5</span>
                 <span className="text-xs text-gray-500">unread messages</span>
               </div>
-              <div className="hidden md:flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <Package className="h-4 w-4 text-purple-600" />
                 <span className="text-sm font-medium">£8,450</span>
                 <span className="text-xs text-gray-500">total spent</span>

@@ -2,6 +2,7 @@ import { DashboardHeader } from '../components/DashboardHeader';
 import { Footer } from '../components/Footer';
 import { MobileBottomNavbar } from '../components/MobileBottomNavbar';
 import { DashboardLayout } from '../components/DashboardLayout';
+import { useAuth } from '../lib/auth.tsx';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -38,12 +39,13 @@ import {
   Zap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../lib/auth.tsx';
+import { useBuyerProjects } from '../hooks/useProjects';
 import { useNavigate } from 'react-router-dom';
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { projects, loading: projectsLoading } = useBuyerProjects(user?.id);
 
   // Empty arrays - ready for database queries
   const stats = {
@@ -299,6 +301,62 @@ export default function DashboardPage() {
                       No recent activity
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* My Projects */}
+            <section>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">My Projects</h2>
+                <Button variant="outline" size="sm" onClick={() => navigate('/my-projects')}>
+                  View All
+                </Button>
+              </div>
+              <Card>
+                <CardContent className="p-6">
+                  {projectsLoading ? (
+                    <div className="text-center py-4 text-gray-500">Loading projects...</div>
+                  ) : projects.length > 0 ? (
+                    <div className="space-y-4">
+                      {projects.slice(0, 3).map((project) => (
+                        <div key={project.id} className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-semibold text-sm line-clamp-2">{project.title}</h4>
+                            <Badge
+                              variant={project.status === 'open' ? 'default' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {project.status}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-gray-600">
+                            <span>£{project.budget}</span>
+                            <span>{new Date(project.created_at).toLocaleDateString()}</span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="mt-2 h-7 px-2 text-xs"
+                            onClick={() => navigate(`/project/${project.id}`)}
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      No projects posted yet
+                      <Button
+                        variant="link"
+                        className="block mt-2 text-primary"
+                        onClick={() => navigate('/post-project')}
+                      >
+                        Post Your First Project
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </section>

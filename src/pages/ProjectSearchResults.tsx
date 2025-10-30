@@ -244,7 +244,7 @@ export default function ProjectSearchResults() {
     <div className="min-h-screen bg-gray-50">
       <SellerDashboardHeader />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-full overflow-hidden">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center mb-4">
@@ -259,9 +259,9 @@ export default function ProjectSearchResults() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-2xl lg:text-3xl font-bold">
                 {query ? `Projects matching "${query}"` : 'Available Projects'}
                 {specialty && specialty !== 'All Specialties' && <span className="text-gray-600"> in {specialty}</span>}
                 {location && <span className="text-gray-600"> • {location}</span>}
@@ -271,9 +271,9 @@ export default function ProjectSearchResults() {
               </p>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-48">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -285,7 +285,7 @@ export default function ProjectSearchResults() {
                 </SelectContent>
               </Select>
 
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 <Filter className="h-4 w-4 mr-2" />
                 Filters
               </Button>
@@ -297,7 +297,7 @@ export default function ProjectSearchResults() {
         <div className="grid grid-cols-1 gap-6">
           {sortedProjects.map((project) => (
             <Card key={project.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">
@@ -339,14 +339,14 @@ export default function ProjectSearchResults() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
+                <div className="flex flex-col gap-4 pt-4 border-t">
+                  <div className="flex items-center space-x-4 flex-1 min-w-0">
+                    <div className="flex items-center space-x-2 flex-shrink-0">
                       <Avatar className="h-8 w-8">
                         <img src={project.client.avatar} alt={project.client.name} />
                       </Avatar>
-                      <div>
-                        <div className="text-sm font-medium">{project.client.name}</div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium truncate">{project.client.name}</div>
                         <div className="flex items-center text-xs text-gray-500">
                           <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-1" />
                           {project.client.rating} ({project.client.reviews} reviews)
@@ -354,22 +354,22 @@ export default function ProjectSearchResults() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600 flex-shrink-0">
                       <span>{project.proposals} proposals</span>
                       <Badge variant={
                         project.urgency === 'high' ? 'destructive' :
                         project.urgency === 'medium' ? 'secondary' : 'outline'
-                      }>
+                      } className="text-xs">
                         {project.urgency} priority
                       </Badge>
                     </div>
                   </div>
 
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
+                  <div className="flex flex-col gap-2 w-full">
+                    <Button variant="outline" size="sm" className="w-full h-10">
                       View Details
                     </Button>
-                    <Button size="sm">
+                    <Button size="sm" className="w-full h-10">
                       Submit Proposal
                     </Button>
                   </div>

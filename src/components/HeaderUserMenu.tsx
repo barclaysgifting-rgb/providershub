@@ -36,6 +36,9 @@ export function HeaderUserMenu() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
 
+  const isSeller = user?.role === 'provider';
+  const isBuyer = user?.role === 'client';
+
   return (
     <>
       <div className="flex items-center space-x-2">
@@ -75,6 +78,9 @@ export function HeaderUserMenu() {
                 </p>
                 <div className="flex items-center space-x-2 mt-2">
                   <Badge variant="secondary" className="text-xs">
+                    {isSeller ? 'Seller' : 'Buyer'}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
                     Premium Member
                   </Badge>
                 </div>
@@ -85,18 +91,38 @@ export function HeaderUserMenu() {
               <User className="mr-2 h-4 w-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/my-orders')}>
-              <Package className="mr-2 h-4 w-4" />
-              My Orders
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/payment-history')}>
-              <DollarSign className="mr-2 h-4 w-4" />
-              Payment History
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/saved-services')}>
-              <BookOpen className="mr-2 h-4 w-4" />
-              Saved Services
-            </DropdownMenuItem>
+            {isBuyer && (
+              <>
+                <DropdownMenuItem onClick={() => navigate('/my-orders')}>
+                  <Package className="mr-2 h-4 w-4" />
+                  My Orders
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/payment-history')}>
+                  <DollarSign className="mr-2 h-4 w-4" />
+                  Payment History
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/saved-services')}>
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Saved Services
+                </DropdownMenuItem>
+              </>
+            )}
+            {isSeller && (
+              <>
+                <DropdownMenuItem onClick={() => navigate('/seller/manage-orders')}>
+                  <Package className="mr-2 h-4 w-4" />
+                  Orders Received
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/seller/earnings')}>
+                  <DollarSign className="mr-2 h-4 w-4" />
+                  Earnings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/favorites')}>
+                  <Heart className="mr-2 h-4 w-4" />
+                  Saved Projects
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuItem onClick={() => navigate('/account-settings')}>
               <Settings className="mr-2 h-4 w-4" />
               Account Settings

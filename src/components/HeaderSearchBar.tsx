@@ -1,10 +1,12 @@
 import { useRef } from 'react';
 import { useSearch } from '../contexts/SearchContext';
+import { useAuth } from '../lib/auth.tsx';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Search, MapPin, Plus } from 'lucide-react';
 
 export function HeaderSearchBar() {
+  const { user } = useAuth();
   const {
     searchQuery,
     setSearchQuery,
@@ -17,6 +19,8 @@ export function HeaderSearchBar() {
   } = useSearch();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const isSeller = user?.role === 'provider';
+  const placeholder = isSeller ? 'Search projects...' : 'Search services...';
 
   return (
     <div className="flex-1 max-w-2xl mx-8">
@@ -26,7 +30,7 @@ export function HeaderSearchBar() {
           <Input
             ref={searchInputRef}
             type="text"
-            placeholder="Search services..."
+            placeholder={placeholder}
             className="w-full pl-10"
             value={searchQuery}
             name="search"

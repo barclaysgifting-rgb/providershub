@@ -1,13 +1,16 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from './lib/auth.tsx';
 import { SearchProvider } from './contexts/SearchContext';
 import { ProjectSearchProvider } from './contexts/ProjectSearchContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminProtectedRoute } from './components/AdminProtectedRoute';
+import { ScrollToTop } from './components/ScrollToTop';
+import { ScrollToTopButton } from './components/ScrollToTopButton';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -28,6 +31,8 @@ import PaymentHistory from "./pages/PaymentHistory";
 import AllServicesPage from "./pages/AllServicesPage";
 import RecentActivityPage from "./pages/RecentActivityPage";
 import UserProfile from "./pages/UserProfile";
+import ProjectDetailPage from "./pages/ProjectDetailPage";
+import MyProjectsPage from "./pages/MyProjectsPage";
 import AccountSettings from "./pages/AccountSettings";
 import PaymentMethods from "./pages/PaymentMethods";
 import Favorites from "./pages/Favorites";
@@ -40,6 +45,7 @@ import AdminPanel from "./pages/AdminPanel";
 import AuthCallback from "./pages/AuthCallback";
 import VerificationSuccess from "./pages/VerificationSuccess";
 import AdminSignup from "./pages/AdminSignup";
+import Home from "./pages/Home";
 
 const queryClient = new QueryClient();
 
@@ -49,7 +55,9 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <ScrollToTopButton />
         <BrowserRouter>
+          <ScrollToTop />
           <SearchProvider>
             <ProjectSearchProvider>
               <Routes>
@@ -62,6 +70,14 @@ const App = () => (
                 <Route path="/searchresults" element={<SearchResults />} />
                 <Route path="/project-search" element={<ProjectSearchResults />} />
                 <Route path="/post-project" element={<PostProject />} />
+                <Route
+                  path="/my-projects"
+                  element={
+                    <ProtectedRoute>
+                      <MyProjectsPage />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/create-service" element={<CreateService />} />
                 <Route path="/my-orders" element={<MyOrders />} />
                 <Route path="/saved-services" element={<SavedServices />} />
@@ -83,7 +99,7 @@ const App = () => (
                   path="/home/:userid"
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <Home />
                     </ProtectedRoute>
                   }
                 />
@@ -96,6 +112,14 @@ const App = () => (
                   }
                 />
                 <Route path="/seller/:id" element={<SellerProfile />} />
+                <Route
+                  path="/project/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ProjectDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/admin/protectedroute/providershub/login" element={<AdminLogin />} />
